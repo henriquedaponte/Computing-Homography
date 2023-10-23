@@ -12,20 +12,60 @@ def get_points(img, n_pts):
 
 
 def getHomography(source, target):
-    
+
+    source_pts = np.array(source)
+    target_pts = np.array(target)
+
+    H = cv2.findHomography(source_pts, target_pts,cv2.RANSAC, 5.0)[0]
+
+    return H
 
 
 
 def calculateOutputSize(original_shape, H):
-    
 
+    # Find the new bounds of the warped image
+    corners = np.array([
+        [0, 0],
+        [original_shape[1]-1, 0],
+        [original_shape[1]-1, original_shape[0]-1],
+        [0, original_shape[0]-1]
+    ], dtype=np.float64)
+
+    new_corners = cv2.perspectiveTransform(corners.reshape(-1,1,2), H)
+
+    x_min, y_min = np.int32(new_corners.min(axis=0).ravel())
+    x_max, y_max = np.int32(new_corners.max(axis=0).ravel())
+
+    return [x_min, y_min, x_max, y_max]
 
 
 def solveQ1(get_pts, n_pts):
+    
+    img = cv2.imread('KITP_face1.JPG')
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+    if get_pts:
+        source_pts = get_points(img, n_pts)
+        target_pts = get_points(np.zeros_like(img), n_pts)
+
+        H = getHomography(source_pts, target_pts)
+        x_min, y_min, x_max, y_max = calculateOutputSize(img.shape, H)
+        
+        # Warp the image using the computed homography matrix
+        dst_width = x_max - x_min
+        dst_height = y_max - y_min
+        dst = cv2.warpPerspective(img, H, (dst_width, dst_height))
+        
+        # Display the result
+        plt.imshow(dst)
+        plt.show()
+
 
 
 
 def solveQ2(get_pts, n_pts):
+    return 0 # STUB
 
 
 
