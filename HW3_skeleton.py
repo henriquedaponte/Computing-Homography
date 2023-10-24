@@ -65,7 +65,29 @@ def solveQ1(get_pts, n_pts):
 
 
 def solveQ2(get_pts, n_pts):
-    return 0 # STUB
+    img1 = cv2.imread('KITP_face1.jpg')  
+    img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2RGB)
+    
+    img2 = cv2.imread('KITP_face2.jpg')
+    img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
+
+    if get_pts:
+        # Select corresponding points in both images
+        source_pts = get_points(img1, n_pts)
+        target_pts = get_points(img2, n_pts)
+
+        # Compute the homography matrix from the points in the first image to the points in the second image
+        H = getHomography(source_pts, target_pts)
+
+        # Calculate output size and warp the first image to the perspective of the second image
+        x_min, y_min, x_max, y_max = calculateOutputSize(img1.shape, H)
+        dst_width = x_max - x_min
+        dst_height = y_max - y_min
+        dst = cv2.warpPerspective(img1, H, (dst_width, dst_height))
+
+        # Display the result
+        plt.imshow(dst)
+        plt.show()
 
 
 
