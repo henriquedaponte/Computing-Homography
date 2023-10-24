@@ -122,10 +122,10 @@ def solveQ2(get_pts, n_pts):
     - get_pts: Boolean indicating if points should be selected manually.
     - n_pts: Number of points to select.
     """
-    img1 = cv2.imread('KITP_face1.jpg')  
+    img1 = cv2.imread('Q21.jpeg')  
     img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2RGB)
     
-    img2 = cv2.imread('KITP_face2.jpg')
+    img2 = cv2.imread('Q22.jpeg')
     img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
 
     if get_pts:
