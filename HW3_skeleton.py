@@ -3,15 +3,35 @@ import matplotlib.pyplot as plt
 import numpy as np
 import argparse
 
-
+# Function to get user-selected points from an image
 def get_points(img, n_pts):
+    """
+    Display an image and let the user click `n_pts` points.
+
+    Parameters:
+    - img: The image to display.
+    - n_pts: The number of points to select.
+
+    Returns:
+    - List of selected points.
+    """
     plt.imshow(img)
     pts = plt.ginput(n_pts)
     plt.close()
     return pts
 
+# Function to compute the homography matrix between two sets of points
 def getHomography(source, target):
+    """
+    Compute the homography matrix based on point correspondences.
 
+    Parameters:
+    - source: List of points from the source image.
+    - target: List of corresponding points from the target image.
+
+    Returns:
+    - 3x3 homography matrix.
+    """
     A = []
     b = []
 
@@ -27,7 +47,7 @@ def getHomography(source, target):
     A = np.array(A)
     b = np.array(b)
 
-    # Solve for h
+    # Solve for h using the least squares method
     h = np.linalg.lstsq(A, b, rcond=None)[0]
     
     # Form the homography matrix
@@ -39,9 +59,18 @@ def getHomography(source, target):
 
     return H
 
+# Function to compute the bounds of the warped image
 def calculateOutputSize(original_shape, H):
+    """
+    Calculate the bounds of the image after applying the homography.
 
-    # Find the new bounds of the warped image
+    Parameters:
+    - original_shape: Shape of the original image.
+    - H: Homography matrix.
+
+    Returns:
+    - List containing the min and max x and y coordinates.
+    """
     corners = np.array([
         [0, 0],
         [original_shape[1]-1, 0],
@@ -56,8 +85,15 @@ def calculateOutputSize(original_shape, H):
 
     return [x_min, y_min, x_max, y_max]
 
+# Function to solve Q1
 def solveQ1(get_pts, n_pts):
-    
+    """
+    Correct the perspective distortion of an image.
+
+    Parameters:
+    - get_pts: Boolean indicating if points should be selected manually.
+    - n_pts: Number of points to select.
+    """
     img = cv2.imread('KITP_face1.JPG')
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
@@ -77,7 +113,15 @@ def solveQ1(get_pts, n_pts):
         plt.imshow(dst)
         plt.show()
 
+# Function to solve Q2
 def solveQ2(get_pts, n_pts):
+    """
+    Synthesize one view from another.
+
+    Parameters:
+    - get_pts: Boolean indicating if points should be selected manually.
+    - n_pts: Number of points to select.
+    """
     img1 = cv2.imread('KITP_face1.jpg')  
     img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2RGB)
     
@@ -85,20 +129,15 @@ def solveQ2(get_pts, n_pts):
     img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
 
     if get_pts:
-        # Select corresponding points in both images
         source_pts = get_points(img1, n_pts)
         target_pts = get_points(img2, n_pts)
 
-        # Compute the homography matrix from the points in the first image to the points in the second image
         H = getHomography(source_pts, target_pts)
-
-        # Calculate output size and warp the first image to the perspective of the second image
         x_min, y_min, x_max, y_max = calculateOutputSize(img1.shape, H)
         dst_width = x_max - x_min
         dst_height = y_max - y_min
         dst = cv2.warpPerspective(img1, H, (dst_width, dst_height))
 
-        # Display the result
         plt.imshow(dst)
         plt.show()
 
@@ -110,12 +149,7 @@ if __name__ == '__main__':
     parser.add_argument('--n_points', type=int, default=4, help='Number of points per image')  
     opt = parser.parse_args()
 
-    # Note that there's no error checking on the existance of the point files
-    # If you try running without get_pts first, it will crash
     if opt.Q1:
         solveQ1(opt.get_pts, opt.n_points)
     if opt.Q2:
         solveQ2(opt.get_pts, opt.n_points)
-
-
-
