@@ -10,7 +10,6 @@ def get_points(img, n_pts):
     plt.close()
     return pts
 
-
 def getHomography(source, target):
 
     A = []
@@ -40,8 +39,6 @@ def getHomography(source, target):
 
     return H
 
-
-
 def calculateOutputSize(original_shape, H):
 
     # Find the new bounds of the warped image
@@ -58,7 +55,6 @@ def calculateOutputSize(original_shape, H):
     x_max, y_max = np.int32(new_corners.max(axis=0).ravel())
 
     return [x_min, y_min, x_max, y_max]
-
 
 def solveQ1(get_pts, n_pts):
     
@@ -80,9 +76,6 @@ def solveQ1(get_pts, n_pts):
         # Display the result
         plt.imshow(dst)
         plt.show()
-
-
-
 
 def solveQ2(get_pts, n_pts):
     img1 = cv2.imread('KITP_face1.jpg')  
@@ -108,8 +101,6 @@ def solveQ2(get_pts, n_pts):
         # Display the result
         plt.imshow(dst)
         plt.show()
-
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
