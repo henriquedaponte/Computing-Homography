@@ -13,10 +13,30 @@ def get_points(img, n_pts):
 
 def getHomography(source, target):
 
-    source_pts = np.array(source)
-    target_pts = np.array(target)
+    A = []
+    b = []
 
-    H = cv2.findHomography(source_pts, target_pts,cv2.RANSAC, 5.0)[0]
+    for i in range(len(source)):
+        x, y = source[i]
+        x_, y_ = target[i]
+        
+        A.append([x, y, 1, 0, 0, 0, -x*x_, -y*x_])
+        A.append([0, 0, 0, x, y, 1, -x*y_, -y*y_])
+        b.append(x_)
+        b.append(y_)
+
+    A = np.array(A)
+    b = np.array(b)
+
+    # Solve for h
+    h = np.linalg.lstsq(A, b, rcond=None)[0]
+    
+    # Form the homography matrix
+    H = np.array([
+        [h[0], h[1], h[2]],
+        [h[3], h[4], h[5]],
+        [h[6], h[7], 1]
+    ])
 
     return H
 
